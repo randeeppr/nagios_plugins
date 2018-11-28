@@ -1,10 +1,5 @@
 #!/bin/bash
-
-# AUthor Randeep P R - randeep123@gmail.com
-# Date 25-11-2018
-
 set -o nounset
-set -o errexit
 version="1.0.0"
 
 STATUS_OK=0
@@ -43,15 +38,16 @@ done
 # if type = multipath
 if [ "$type" == "multipath" ]
   then
+      type="$(tr '[:lower:]' '[:upper:]' <<< ${type:0:1})${type:1}"
       MULITPATH="$(rpm -qa | grep -i multipath |wc -l)"
-      if [ $MULITPATH -ge 1 ]
+      if [ "$MULITPATH" -ge 1 ]
       then
   	    MULT="$(multipath -ll)"
-	    MULT_FAILED="$(echo -n $MULT | grep -i failed)"
+	    MULT_FAILED="$(echo -n "$MULT" | grep -i failed)"
 	    if [ "$verbose" == "True" ]
-	    then
-	      echo "$MULT"
-              echo "$MULT_FAILED"
+	      then
+	        echo "$MULT"
+            echo "$MULT_FAILED"
 	    fi
 	    if [ "$MULT" == "" ]
             then
@@ -59,10 +55,10 @@ if [ "$type" == "multipath" ]
               exit "$STATUS_UNKNOWN"
 	    elif [ "$MULT_FAILED" == "" ]
   	    then
-              echo "SAN OK. All paths are fine."
+              echo "$type: SAN OK. All paths are fine."
               exit "$STATUS_OK"
 	    else
-              echo "SAN issue detected. One or more SAN paths is in degraded mode."
+              echo "$type: SAN issue detected. One or more SAN paths is in degraded mode."
               exit "$STATUS_CRITICAL"
 	    fi
       else
@@ -74,6 +70,7 @@ if [ "$type" == "multipath" ]
 # if type = powerpath
 elif [ "$type" == "powerpath" ]
 then
+type="$(tr '[:lower:]' '[:upper:]' <<< ${type:0:1})${type:1}"
 # Routine to check is PowerPath is installed and being used.  If not, exit 0
 case "$OS" in
     'Linux' )
@@ -81,10 +78,10 @@ case "$OS" in
             if [ $POWERPATH_CHECK -eq 1 -o $POWERPATH_CHECK -gt 1 ]; then
                 CHECK_DEGRADED=`/usr/bin/sudo /sbin/powermt display | egrep "degraded|failed" | wc -l`
                     if [ $CHECK_DEGRADED -eq 1 -o $CHECK_DEGRADED -gt 1 ]; then
-                        echo "SAN issue detected. One or more SAN paths is in degraded mode."
+                        echo "$type: SAN issue detected. One or more SAN paths is in degraded mode."
                         exit 2
                     else
-                        echo "SAN OK. All paths are fine."
+                        echo "$type: SAN OK. All paths are fine."
                         exit 0
                     fi
             else
@@ -97,10 +94,10 @@ case "$OS" in
             if [ $POWERPATH_CHECK -eq 1 -o $POWERPATH_CHECK -gt 1 ]; then
                 CHECK_DEGRADED=`/usr/local/bin/sudo /sbin/powermt display | grep degraded | wc -l`
                     if [ $CHECK_DEGRADED -eq 1 -o $CHECK_DEGRADED -gt 1 ]; then
-                        echo "SAN issue detected.  One or more SAN paths is in degraded mode."
+                        echo "$type: SAN issue detected.  One or more SAN paths is in degraded mode."
                         exit 2
                     else
-                        echo "SAN OK. All paths are fine."
+                        echo "$type: SAN OK. All paths are fine."
                         exit 0
                     fi
             else
@@ -113,10 +110,10 @@ case "$OS" in
             if [ $POWERPATH_CHECK -eq 1 -o $POWERPATH_CHECK -gt 1 ]; then
                 CHECK_DEGRADED=`/usr/local/bin/sudo /etc/powermt display | grep degraded | wc -l`
                     if [ $CHECK_DEGRADED -eq 1 -o $CHECK_DEGRADED -gt 1 ]; then
-                        echo "SAN issue detected.  One or more SAN paths is in degraded mode."
+                        echo "$type: SAN issue detected.  One or more SAN paths is in degraded mode."
                         exit 2
                     else
-                        echo "SAN OK. All paths are fine."
+                        echo "$type: SAN OK. All paths are fine."
                         exit 0
                     fi
             else
