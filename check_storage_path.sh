@@ -1,4 +1,7 @@
 #!/bin/bash
+# Author : Randeep P R
+# Email : randeep123@gmail.com
+# Website : www.linuxhelp.in
 set -o nounset
 version="1.0.0"
 
