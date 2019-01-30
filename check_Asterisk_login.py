@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import sys,getopt,re,socket,time
+import sys,getopt,re,socket
 from telnetlib import Telnet
 
 STATUS_OK = 0
